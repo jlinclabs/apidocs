@@ -16,7 +16,7 @@
 title: JLINCLabs API Documentation
 email: dev@jlinclabs.com
 description: >- # Documentation for the JLINC Labs A and B servers external APIs.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/apidocs" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
 

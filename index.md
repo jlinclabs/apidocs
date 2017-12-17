@@ -35,8 +35,16 @@ If `success` is true, then the other data is context specific.
 ```
 Although this does not conform to REST, the REST conventions are still respected in two ways. First, calls that return information without changing server state use `GET` and all others use `POST`.
 
-Secondly, in the event of an authentication failure we return an HTTP `401` error so that the caller can redirect the user to a login page without further ado. And if the caller requests a non-existent endpoint we return an HTTP `404` error, and internal server errors return `500` responses.
+Secondly, in the event of an authentication failure we return an HTTP `401` error so that the caller can redirect the user to a login page (or other authentication process) without further ado. And if the caller requests a non-existent endpoint we return an HTTP `404` error, and internal server errors return `500` responses.
 
 {% include starsep.html %}
 
 ### Onboarding new users
+
+A new user can be onboarded in one of two ways:
+* either BobCo supplies customer information on Alice to the B server, which generates an invitation URL which BobCo transmits to Alice, enabling her to sign up,
+* or Alice creates or accesses her account on her app, and her app displays a list of vendors to whom she can offer information via the A server.
+
+The B server method can be reviewed <a href="{{ '/b_server#onboarding' | relative_url }}">here</a>.
+
+The A server method is still under development.

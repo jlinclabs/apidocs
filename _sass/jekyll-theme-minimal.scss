@@ -205,6 +205,12 @@ header p.view {
   margin: 3px 0;
 }
 
+code.highlighter-rouge {
+  background: #f8f8f8;
+  color: #d14;
+  padding: 2px;
+}
+
 @media print, screen and (max-width: 960px) {
 
   div.wrapper {

@@ -18,9 +18,9 @@
         <a href="{{ site.github.url }}"> <h2>{{ site.title | default: site.github.repository_name }}</h2> </a>
 
         {% if site.github.is_project_page %}
-          <p class="view"><a href="{{ site.baseurl }}/">Introduction</a></p>
-          <p class="view"><a href="{{ site.baseurl }}/a_server">A Server</a></p>
-          <p class="view"><a href="{{ site.baseurl }}/b_server">B Server</a></p>
+          <p class="view"><a href="{{ '/' | relative_url }}">Introduction</a></p>
+          <p class="view"><a href="{{ '/a_server' | relative_url }}">A Server</a></p>
+          <p class="view"><a href="{{ '/b_server' | relative_url }}">B Server</a></p>
         {% endif %}
       </header>
       <section>

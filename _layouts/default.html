@@ -6,7 +6,7 @@
 
 {% seo %}
 
-    <link rel="stylesheet" href="{{ site.url }}{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    <link rel="stylesheet" href="{{ '/apidocs/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
     <meta name="viewport" content="width=device-width">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -19,9 +19,9 @@
         <p>{{ site.description | default: site.github.project_tagline }}</p>
 
         {% if site.github.is_project_page %}
-          <p class="view"><a href="{{ site.url }}/">Introduction</a></p>
-          <p class="view"><a href="{{ site.url }}/a_server">A Server</a></p>
-          <p class="view"><a href="{{ site.url }}/b_server">B Server</a></p>
+          <p class="view"><a href="/apidocs/">Introduction</a></p>
+          <p class="view"><a href="/apidocs/a_server">A Server</a></p>
+          <p class="view"><a href="/apidocs/b_server">B Server</a></p>
         {% endif %}
       </header>
       <section>
@@ -33,7 +33,7 @@
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
-    <script src="{{ site.url }}{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
+    <script src="{{ '/apidocs/assets/js/scale.fix.js' | relative_url }}"></script>
 
   </body>
 </html>

@@ -6,7 +6,7 @@ layout: default
 ### [ ](#onboarding)Onboarding a new user
 This is an API to create a signup link that BobCo can send to Alice, inviting her to take charge of the contact information he has about her, and set her preferences about what he can do with it.
 
-_POST https://staging.b.jlinclabs.net/api/userdata/new_user_
+_POST https://sandbox.b.jlinclabs.net/api/userdata/new_user_
 
 ```json
 {

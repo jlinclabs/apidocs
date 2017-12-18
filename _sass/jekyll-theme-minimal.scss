@@ -203,6 +203,9 @@ footer {
 
 header p.view {
   margin: 3px 0;
+  &.last {
+    margin-bottom: 12px;
+  }
 }
 
 code.highlighter-rouge {

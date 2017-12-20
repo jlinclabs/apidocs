@@ -101,7 +101,7 @@ _POST https://sandbox.a.jlinclabs.net/api/authn/logout_
  "token": "de7a126fef783bd6d9ac1da48cada93ee"
 }
 ```
-On success it returns just
+On success it returns just:
 ```json
 {
  "success": true
@@ -113,6 +113,25 @@ On success it returns just
 ### [ ](#vendorlist)Obtaining the vendor list
 In order to retrieve vendor specific information for the user, you must provide both a login token and a vendor public key.
 
-This API returns a list of vendor choices for this user, which you can use to link the user to their chosen vendor's information pages.
+To get that vendor key, use this API. It returns a list of vendor choices for this user.  
+The format is /api/vendors/{login_token}
 
-_(Coming next)_
+_GET https://staging.a.jlinclabs.net/api/vendors/de7a126fef783bd6..._
+
+Which returns:
+
+```json
+{
+ "success": true,
+ "vendors": [
+   {
+    "vendor_pk": "Xp0A5Jj9wb1QpVSU0u8hhbks3FWcrgU1I3RZmghfNkU",
+    "vendor_name": "bobco"
+   },
+   {
+    "vendor_pk": "V30PBeHuRk90M6K5r7rdLZ2ifMte6hnw2eA0X9uD_78",
+    "vendor_name": "charlieco"
+   }
+  ]
+}
+```

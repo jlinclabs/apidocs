@@ -139,9 +139,9 @@ Which returns:
 {% include starsep.html %}
 
 ### Retrieving user account data
-Send the login token and the vendor public key to /api/accountdata/{login_token}/{vendor_pk}
+Send the login token and the vendor public key to /api/remotedata/accountdata/{login_token}/{vendor_pk}
 
-_GET https://staging.a.jlinclabs.net/api/accountdata/01cc7e16.../Xp0A5Jj9..._
+_GET https://staging.a.jlinclabs.net/api/remotedata/accountdata/2dfb4668.../XxnnSLWq..._
 
 Returns:
 

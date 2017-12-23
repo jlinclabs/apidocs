@@ -116,7 +116,7 @@ In order to retrieve vendor specific information for the user, you must provide 
 To get that vendor key, use this API. It returns a list of vendor choices for this user.  
 The format is /api/vendors/{login_token}
 
-_GET https://staging.a.jlinclabs.net/api/vendors/de7a126fef783bd6..._
+_GET https://sandbox.a.jlinclabs.net/api/vendors/de7a126fef783bd6..._
 
 Which returns:
 
@@ -141,7 +141,7 @@ Which returns:
 ### Retrieving user account data
 Send the login token and the vendor public key to /api/remotedata/accountdata/{login_token}/{vendor_pk}
 
-_GET https://staging.a.jlinclabs.net/api/remotedata/accountdata/2dfb4668.../XxnnSLWq..._
+_GET https://sandbox.a.jlinclabs.net/api/remotedata/accountdata/2dfb4668.../XxnnSLWq..._
 
 Returns:
 

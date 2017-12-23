@@ -3,7 +3,7 @@ layout: default
 ---
 ## The A server
 
-### [ ](#signup_urls)Using signup URLs
+### Using signup URLs
 When the front-end regauth page is accessed by a signup url, for example:  
 _https://alpha.userprefs.com/regauth/65c29f1ff4975dff_  
 the regauth page should put up a "please wait - this may take a few moments" type notice and then extract the token from the url to call the A server
@@ -38,7 +38,7 @@ If the user submits a token that has already been used, the `signuptoken` field 
 
 {% include starsep.html %}
 
-### [ ](#registration)Registering a new user
+### Registering a new user
 When a prospective new user arrives at the app's registration page with a signuptoken, as above, they should be presented with a form asking for an email address to use as a username, and passphrase and passphrase confirmation fields.
 
 The app then submits the form data and the signuptoken to the A server.
@@ -75,7 +75,7 @@ The user is now logged in and can move to the logged-in user menu items.
 
 {% include starsep.html %}
 
-### [ ](#loggingin)Re-logging in
+### Re-logging in
 
 _POST https://sandbox.a.jlinclabs.net/api/authn/login_
 ```json
@@ -94,7 +94,7 @@ On success it returns
 
 {% include starsep.html %}
 
-### [ ](#loggingout)Logging out
+### Logging out
 _POST https://sandbox.a.jlinclabs.net/api/authn/logout_
 ```json
 {
@@ -110,7 +110,7 @@ On success it returns just:
 
 {% include starsep.html %}
 
-### [ ](#vendorlist)Obtaining the vendor list
+### Obtaining the vendor list
 In order to retrieve vendor specific information for the user, you must provide both a login token and a vendor public key.
 
 To get that vendor key, use this API. It returns a list of vendor choices for this user.  
@@ -135,3 +135,44 @@ Which returns:
   ]
 }
 ```
+
+{% include starsep.html %}
+
+### Retrieving user account data
+Send the login token and the vendor public key to /api/accountdata/{login_token}/{vendor_pk}
+
+_GET https://staging.a.jlinclabs.net/api/accountdata/01cc7e16.../Xp0A5Jj9..._
+
+Returns:
+
+```json
+{
+ "success": true,
+ "accountData": {
+   "rhldr_id": "DrMVuLh_hUbvrUZt2SZqMFgw1DN9ZQl6OvzgNz9Fo98",
+   "email": "alice@example.com",
+   "firstname": "Alice",
+   "lastname": "McPerson",
+   "fullname": "Alice McPerson",
+   "mailingstreet": "123 Main Street",
+   "mailingcity": "Oakland",
+   "mailingstate": "CA",
+   "mailingpostalcode": "01234",
+   "mailingcountry": "US",
+   "homephone": "555-111-4444",
+   "mobilephone": "555-111-2222",
+   "email_share": true,
+   "firstname_share": true,
+   "lastname_share": true,
+   "mailingstreet_share": true,
+   "mailingcity_share": true,
+   "mailingstate_share": true,
+   "mailingpostalcode_share": true,
+   "mailingcountry_share": true,
+   "homephone_share": true,
+   "mobilephone_share": true
+ }
+}
+```
+
+The fields ending in "_share" indicate whether the corresponding data field should be shared with the B server, or just retained on the A server.

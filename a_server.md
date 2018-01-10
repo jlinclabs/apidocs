@@ -153,7 +153,6 @@ Returns:
    "email": "alice@example.com",
    "firstname": "Alice",
    "lastname": "McPerson",
-   "fullname": "Alice McPerson",
    "mailingstreet": "123 Main Street",
    "mailingcity": "Oakland",
    "mailingstate": "CA",
@@ -176,3 +175,54 @@ Returns:
 ```
 
 The fields ending in "_share" indicate whether the corresponding data field should be shared with the B server, or just retained on the A server.
+
+On first access after a new registration, the data held by the B Server on the new account is returned, along with the "_share" fields defaulted to true. After that the data stored on the local A Server is returned.
+
+{% include starsep.html %}
+
+### Editing user account data
+
+_POST https://sandbox.a.jlinclabs.net/api/remotedata/updatecontactdata_
+```json
+{
+ "token": "c51f3eaf6fb2664916401b7be0c8c94c59aa427a30690530a000adfd944a33c2",
+ "vendorpk": "mj4PuJVDjvYBmDjKKBGSXf_LOSv3BBG4Jr4Ij3iOtWo",
+ "updateAll": true,
+ "data": {
+  "mailingpostalcode": "00001",
+  "firstname": "Test"
+ }
+}
+```
+
+If the `updateAll` key is set to anything but `true` or omitted, then the update is only applied to the vendor whose public key is supplied in `vendorpk`. When `updateAll` is true, all the vendors that this (identified by the login token) user is registered with are updated.
+
+The currently available fields are:
+
+```
+firstname
+lastname
+mailingstreet
+mailingcity
+mailingpostalcode
+mailingcountry
+phone
+homephone
+mobilephone
+email
+birthdate
+gender
+```
+
+The birthdate value should be in the format `yyyy-mm-dd`. All other fields are plain text format.
+
+On success the number of vendors updated is returned.
+
+```json
+{
+ "success": true,
+ "updated": 3
+}
+```
+
+A JLINC receipt from the B server for the update will become available asynchronously.

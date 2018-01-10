@@ -225,4 +225,4 @@ On success the number of vendors updated is returned.
 }
 ```
 
-A JLINC receipt from the B server for the update will become available asynchronously.
+A JLINC receipt from each B server for the update will become available asynchronously.

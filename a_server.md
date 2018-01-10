@@ -195,7 +195,7 @@ _POST https://sandbox.a.jlinclabs.net/api/remotedata/updatecontactdata_
 }
 ```
 
-If the `updateAll` key is set to anything but `true` or omitted, then the update is only applied to the vendor whose public key is supplied in `vendorpk`. When `updateAll` is true, all the vendors that this (identified by the login token) user is registered with are updated.
+When `updateAll` is set to `true`, all the vendors that the user identified by the login token is registered with are updated. If the `updateAll` key is omitted or set to anything other than `true`, then the update is only applied to the vendor whose public key is supplied in `vendorpk`. The `vendorpk` value whose page the request is originating from must be supplied in either case.
 
 The currently available fields are:
 

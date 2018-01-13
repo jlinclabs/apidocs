@@ -226,3 +226,92 @@ On success the number of vendors updated is returned.
 ```
 
 A JLINC receipt from each B server for the update will become available asynchronously.
+
+
+{% include starsep.html %}
+
+### Editing user account items to share
+Each of the fields in a user's account with a vendor can be marked as to whether to share changes in that field with the vendor or not.
+
+These show up when accessing the account data as the fields ending in `_share` which correspond to the field in the basename. For example, `mailingstreet_share` indicates whether to share `mailingstreet` changes with the vendor.
+
+The API to edit these fields is:  
+_POST https://sandbox.a.jlinclabs.net/api/remotedata/updatecontactshare_
+```json
+{
+ "token": "c51f3eaf6fb2664916401b7be0c8c94c59aa427a30690530a000adfd944a33c2",
+ "vendorpk": "mj4PuJVDjvYBmDjKKBGSXf_LOSv3BBG4Jr4Ij3iOtWo",
+ "updateAll": true,
+ "sharedata": {
+  "mailingstreet": false,
+  "mailingcity": false,
+  "mailingpostalcode": false,
+  "mailingcountry": true
+ }
+}
+```
+
+The `updateAll` key if set to `true` updates the changes with all the user's vendors.
+
+On success the number of vendors updated is returned.
+
+```json
+{
+ "success": true,
+ "updated": 3
+}
+```  
+
+{% include starsep.html %}
+
+### Retrieving user preferences
+
+Send the login token and the vendor public key to /api/remotedata/prefsdata/{login_token}/{vendor_pk}
+
+_GET https://sandbox.a.jlinclabs.net/api/remotedata/prefsdata/2dfb4668.../XxnnSLWq..._
+
+Returns:
+
+```json
+{
+ "success": true,
+ "prefsData": {
+  "emailmarketing": false,
+  "emailcomms": true
+  }
+}
+```
+
+Currently the `emailmarketing` and `emailcomms` fields are the only preference settings available.
+
+
+{% include starsep.html %}
+
+### Editing user preferences
+
+The API to edit preference fields is:  
+_POST https://sandbox.a.jlinclabs.net/api/remotedata/updateprefsdata_
+```json
+{
+ "token": "c51f3eaf6fb2664916401b7be0c8c94c59aa427a30690530a000adfd944a33c2",
+ "vendorpk": "mj4PuJVDjvYBmDjKKBGSXf_LOSv3BBG4Jr4Ij3iOtWo",
+ "updateAll": true,
+ "data": {
+  "emailmarketing": true,
+  "emailcomms": true
+ }
+}
+```
+
+The `updateAll` key if set to `true` updates the changes with all the user's vendors.
+
+On success the number of vendors updated is returned.
+
+```json
+{
+ "success": true,
+ "updated": 3
+}
+```  
+
+A JLINC receipt from each B server for the update will become available asynchronously.

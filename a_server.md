@@ -315,3 +315,74 @@ On success the number of vendors updated is returned.
 ```  
 
 A JLINC receipt from each B server for the update will become available asynchronously.
+
+{% include starsep.html %}
+
+### Retrieving receipts
+
+Send the login token and the vendor public key to /api/remotedata/rcptsdata/{login_token}/{vendor_pk}
+
+_GET https://sandbox.a.jlinclabs.net/api/remotedata/rcptsdata/2dfb4668.../XxnnSLWq..._
+
+Returns an array of the user's receipts:
+
+```json
+{
+ "success": true,
+  "receipts": [
+  {
+   "receipt": {
+    "@context": "https://jlinclabs.org/v05/context/isa-rcpt.jsonld",
+    "Version": "0.5",
+    "DataTS": 1516483209480,
+    "ISAHash": "KoCe5IQPtjtnXTyTNWTy8AeQleaw2Hxr8O6W02HjZ3k",
+    "DataHash": "g8HVIhhavQsgVuDjoA-hnrd3vKr0bJ2AokMus_tWvfc",
+    "RhldrPkID": "hRgwFkb9-7ed9xtX8009MltbpjaX7uIlJUYrMDRQUco",
+    "RhldrSig": "I2lslUas26yV23r4WVj5hzcfELlHOya-atVHYE0BQ2dLPFoUOv_17dseoFLi4tQRQflhXYo_ojNfdkyp-NJYD8TYy5zsr1CdN_8dqultqtnhCvdeaC2IAXKaNH-d2uoT",
+    "DcustPkAlg": "sha256:ed25519",
+    "DcustPkID": "GbxQVQrjoYbiQ-ALGJNmpblsLSKt3ROMmpa7Zn0Rv4g",
+    "DcustSig": "lNb6lrorwrMhSfh_0FRtNuRQrvSxbWYlm1ZZ287ZMfJ4RMWcSOBaxmHtnujO_rSn0itXJ2STwLaCHK1TQGcpDcTYy5zsr1CdN_8dqultqtnhCvdeaC2IAXKaNH-d2uoT"
+   },
+   "subject_data": {
+    "homephone": "555-111-3334",
+    "email": "user5@example.com"
+   },
+   "created": "2018-01-20T21:20:09.521Z"
+  },
+  {
+   "receipt": {
+    "@context": "https://jlinclabs.org/v05/context/isa-rcpt.jsonld",
+    "Version": "0.5",
+    "ISAHash": "KoCe5IQPtjtnXTyTNWTy8AeQleaw2Hxr8O6W02HjZ3k",
+    "DataHash": "ONisgH5_rATj-JtbEFm4l8m5KNYk6bJSy4WR1ktB608",
+    "DataTS": 1515997768035,
+    "DcustPkAlg": "sha256:ed25519",
+    "DcustPkID": "GbxQVQrjoYbiQ-ALGJNmpblsLSKt3ROMmpa7Zn0Rv4g",
+    "RhldrPkID": "hRgwFkb9-7ed9xtX8009MltbpjaX7uIlJUYrMDRQUco",
+    "DcustSig": "hRsQWOYhPlMSDn3UTBbeVN8HD8g30zSiBgekirq4Im8UG4vTqmC7AcwPik4XJxGeSWf3ap9br9a_onPkx3ZTDJoJQ0aDRO33LMfZkQtlVa0DdMaaoy99GXSMAvFJ5xdm"
+   },
+   "subject_data": {
+    "firstname": "Test",
+    "lastname": "User5",
+    "name": "Test User5",
+    "mailingstreet": "123 Main Street",
+    "mailingcity": "Oakland",
+    "mailingstate": "CA",
+    "mailingpostalcode": "12345",
+    "mailingcountry": "US",
+    "homephone": "555-111-4444",
+    "mobilephone": "555-111-2222",
+    "email": "user5@example.com"
+   },
+   "created": "2018-01-15T06:29:28.050Z"
+  }
+ ]
+}
+```
+
+Appending a query string with variables `page` and/or `num` controls the pagination.  Order doesn't matter, and either or both may be omitted.
+
+If omitted, `page` defaults to 1 and `num` (the number of receipts to show per page) defaults to 10.
+
+Example:  
+_GET https://.../api/remotedata/rcptsdata/.../...?page=2&num=20_

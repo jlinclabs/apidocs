@@ -384,5 +384,7 @@ Appending a query string with variables `page` and/or `num` controls the paginat
 
 If omitted, `page` defaults to 1 and `num` (the number of receipts to show per page) defaults to 10.
 
+Receipts are always sorted by creation date/time, with the newest at the top.
+
 Example:  
 _GET https://.../api/remotedata/rcptsdata/.../...?page=2&num=20_

@@ -36,6 +36,27 @@ If the user submits a token that has already been used, the `signuptoken` field 
 }
 ```
 
+#### Signing up an existing user to a new vendor
+
+Include the user's logintoken along with the registration token:  
+_POST https://sandbox.a.jlinclabs.net/api/register/new_
+
+```json
+{
+ "token": "65c29f1ff4975dff",
+ "logintoken": "ecdf4593d3e134574794a061be"
+}
+```
+
+On success the B server will return a `vendorPk` public key, which can be used to redirect the user to the new vendor's page..
+
+```json
+{
+ "success": true,
+ "vendorPk": "GbxQVQrjoYbiQ-ALGJNmpblsLSKt3ROMmpa7Zn0Rv4g"
+}
+```
+
 {% include starsep.html %}
 
 ### Registering a new user

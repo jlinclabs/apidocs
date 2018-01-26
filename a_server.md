@@ -36,27 +36,6 @@ If the user submits a token that has already been used, the `signuptoken` field 
 }
 ```
 
-#### Signing up an existing user to a new vendor
-
-Include the user's logintoken along with the registration token:  
-_POST https://sandbox.a.jlinclabs.net/api/register/new_
-
-```json
-{
- "token": "65c29f1ff4975dff",
- "logintoken": "ecdf4593d3e134574794a061be"
-}
-```
-
-On success the B server will return a `vendorPk` public key, which can be used to redirect the user to the new vendor's page..
-
-```json
-{
- "success": true,
- "vendorPk": "GbxQVQrjoYbiQ-ALGJNmpblsLSKt3ROMmpa7Zn0Rv4g"
-}
-```
-
 {% include starsep.html %}
 
 ### Registering a new user
@@ -93,6 +72,32 @@ The `nicepwd` is a recovery key - you want to display that to them and encourage
 
 Store the `logintoken`, `vendorname` and `vendor_pk` (the vendor's public key).  
 The user is now logged in and can move to the logged-in user menu items.
+
+#### Signing up an existing user with a new vendor
+
+Obtain a signuptoken as above. On the registration form page, offer the user the alternative to add this vendor to an existing account by logging into the existing account.
+
+That login form should target /api/authn/register_add with the username, passphrase and signuptoken:  
+_POST https://sandbox.a.jlinclabs.net/api/authn/register_add_
+
+```json
+{
+ "username": "alice@example.com",
+ "passphrase": "foobar",
+ "signuptoken": "ec281d5348c24ed0d8637297ed9faad4"
+}
+```
+
+On success the A server will return a login token and a `vendorPk` public key, which can be used to redirect the user to the new vendor's page..
+
+```json
+{
+ "success": true,
+ "logintoken": "6f81124583a583034df88a9664891a8b",
+ "vendorPk": "JC0W885tID6b71XJ915uq-Ktqf9OFJgbu3iBNQ1IHnI"
+}
+```
+
 
 {% include starsep.html %}
 

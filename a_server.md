@@ -73,6 +73,9 @@ The `nicepwd` is a recovery key - you want to display that to them and encourage
 Store the `logintoken`, `vendorname` and `vendor_pk` (the vendor's public key).  
 The user is now logged in and can move to the logged-in user menu items.
 
+##### N.B. The user's first access to their account data pulls that data from the B server. Until that happens their account data does not exist on the A server.
+##### Once they have made that initial access, the user has taken control of their data on the B server, and subsequent updates of that data will be pushed to the B server if the user's permissions allow it.
+
 #### Signing up an existing user with a new vendor
 
 Obtain a signuptoken as above. On the registration form page, offer the user the alternative to add this vendor to an existing account by logging into the existing account.
@@ -186,6 +189,8 @@ Returns:
    "mailingcountry": "US",
    "homephone": "555-111-4444",
    "mobilephone": "555-111-2222",
+   "birthdate": "2001-08-01",
+   "gender": "female",
    "email_share": true,
    "firstname_share": true,
    "lastname_share": true,
@@ -195,7 +200,10 @@ Returns:
    "mailingpostalcode_share": true,
    "mailingcountry_share": true,
    "homephone_share": true,
-   "mobilephone_share": true
+   "mobilephone_share": true,
+   "birthdate_share": true,
+   "gender_share": true,
+   "all_share": true
  }
 }
 ```
@@ -203,6 +211,8 @@ Returns:
 The fields ending in "_share" indicate whether the corresponding data field should be shared with the B server, or just retained on the A server.
 
 On first access after a new registration, the data held by the B Server on the new account is returned, along with the "_share" fields defaulted to true. After that the data stored on the local A Server is returned.
+
+If `all_share` is set to false, no updates are shared with the B server, regardless of the settings of the other _share fields.
 
 {% include starsep.html %}
 
@@ -231,6 +241,7 @@ lastname
 mailingstreet
 mailingcity
 mailingpostalcode
+mailingstate
 mailingcountry
 phone
 homephone
@@ -287,6 +298,17 @@ On success the number of vendors updated is returned.
  "updated": 3
 }
 ```  
+
+No sharing of any fields with a particular vendor may be set like so:  
+```json
+{
+ "token": "c51f3eaf6fb2664916401b7be0c8c94c59aa427a30690530a000adfd944a33c2",
+ "vendorpk": "mj4PuJVDjvYBmDjKKBGSXf_LOSv3BBG4Jr4Ij3iOtWo",
+ "sharedata": {
+  "all": false
+ }
+}
+```
 
 {% include starsep.html %}
 

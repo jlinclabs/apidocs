@@ -332,6 +332,26 @@ Returns:
 
 Currently the `emailmarketing` and `emailcomms` fields are the only preference settings available.
 
+{% include starsep.html %}
+
+### Retrieving user's default preferences
+
+Send the login token to /api/remotedata/defaultprefs/{login_token}
+
+_GET https://sandbox.a.jlinclabs.net/api/remotedata/defaultprefs/2dfb4668..._
+
+Returns:
+
+```json
+{
+ "success": true,
+ "defaultPrefs": {
+  "emailmarketing": false,
+  "emailcomms": true
+  }
+}
+```
+
 
 {% include starsep.html %}
 

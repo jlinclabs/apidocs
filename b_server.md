@@ -41,3 +41,97 @@ On success a signup link will be returned:
 ```
 
 This link should be sent to Alice to register her account with BobCo.
+
+### Registering a new org admin
+An org is an organization or company or company division -- any entity that has control of one or more apikeys/apisecrets.
+
+To create an login credential for a person or role that will administer these apikeys:
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/register_
+
+```json
+{
+ "username": "OrgAdmin",
+ "password": "foobar",
+ "pwdconfirm": "foobar"
+}
+```
+
+Usernames are converted to lowercase for both registration and login.  
+On success the lowercased username will be returned:
+
+```json
+{
+ "success": true,
+ "username": "orgadmin"
+}
+```
+
+### Checking whether an org admin username is already in use
+
+_GET https://sandbox.b.jlinclabs.net/api/orgs/exists/{name-to-check}_
+
+If the name (after lowercasing) is available (i.e. does not exist), the reply result will be `false`. If the name does exist the reply will be `true`.
+
+```json
+{
+ "success": true,
+ "result": false
+}
+```
+
+### Logging in an org admin
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/login
+
+```json
+{
+ "username": "OrgAdmin",
+ "password": "foobar"
+}
+```
+
+Usernames are lowercased before checking. A successful login returns a session ID:
+
+```json
+{
+ "success": true,
+ "sessionID": "5e1668d7fffaadabf0474088e..."
+}
+```
+
+### Verifying a session ID
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/authn
+
+```json
+{
+ "session_id": "5e1668d7fffaadabf0474088e..."
+}
+```
+
+If the session is valid, updates the session time-to-live and returns true. Otherwise returns false.
+
+```json
+{
+ "success": true
+}
+```
+
+### Logging out an org admin
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/logout
+
+```json
+{
+ "session_id": "5e1668d7fffaadabf0474088e..."
+}
+```
+
+If the session exists and has been destroyed returns true.
+
+```json
+{
+ "success": true
+}
+```

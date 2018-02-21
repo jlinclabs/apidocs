@@ -110,7 +110,7 @@ _POST https://sandbox.b.jlinclabs.net/api/orgs/authn
 }
 ```
 
-If the session is valid, updates the session time-to-live and returns true. Otherwise returns false.
+If the session is valid, updates the session time-to-live and returns true. Otherwise returns false with a 401 status.
 
 ```json
 {

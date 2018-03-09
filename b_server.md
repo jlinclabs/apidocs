@@ -45,7 +45,7 @@ This link should be sent to Alice to register her account with BobCo.
 ### Registering a new org admin
 An org is an organization or company or company division -- any entity that has control of one or more apikeys/apisecrets.
 
-To create an login credential for a person or role that will administer these apikeys:
+To create an login credential for a person or role that will administer these apikeys requires a signup token from the manager:
 
 _POST https://sandbox.b.jlinclabs.net/api/orgs/register_
 
@@ -53,7 +53,8 @@ _POST https://sandbox.b.jlinclabs.net/api/orgs/register_
 {
  "username": "OrgAdmin",
  "password": "foobar",
- "pwdconfirm": "foobar"
+ "pwdconfirm": "foobar",
+ "signuptoken": "48ea8317920bb268ebc7739c8ecee4c5"
 }
 ```
 

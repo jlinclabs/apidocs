@@ -42,6 +42,27 @@ On success a signup link will be returned:
 
 This link should be sent to Alice to register her account with BobCo.
 
+### Onboarding a new user authenticating with sessionID
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/invite_end_user_
+
+```json
+{
+  "session_id": "84u98y4t7uhut4…",
+  "email": "failedmarriage@deadend.edu"
+}
+```
+
+If the session ID is valid, returns a signup url.
+
+```json
+{
+ "success": true,
+ "signup": "https://alpha.userprefs.com/regauth/65c29f1ff4975dff"
+}
+
+```
+
 ### Registering a new org admin
 An org is an organization or company or company division -- any entity that has control of one or more apikeys/apisecrets.
 
@@ -188,7 +209,7 @@ If the session ID is valid, updates the organization profile, then returns true 
 
 ### Logging out an org admin
 
-_POST https://sandbox.b.jlinclabs.net/api/orgs/logout
+_POST https://sandbox.b.jlinclabs.net/api/orgs/logout_
 
 ```json
 {

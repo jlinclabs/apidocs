@@ -3,6 +3,17 @@ layout: default
 ---
 ## The B server
 
+### Server status
+_GET https://sandbox.b.jlinclabs.net/status_
+
+If the server is responding returns:
+
+```json
+{
+  "status": "OK"
+}
+```
+
 ### Onboarding a new user
 This is an API to create a signup link that BobCo can send to Alice, inviting her to take charge of the contact information he has about her, and set her preferences about what he can do with it.
 
@@ -42,29 +53,33 @@ On success a signup link will be returned:
 
 This link should be sent to Alice to register her account with BobCo.
 
-### Registering a new org admin
-An org is an organization or company or company division -- any entity that has control of one or more apikeys/apisecrets.
+### Creating a new org
 
-To create an login credential for a person or role that will administer these apikeys requires a signup token from the manager:
+_POST https://sandbox.b.jlinclabs.net/api/orgs/create_
 
-_POST https://sandbox.b.jlinclabs.net/api/orgs/register_
+Creates a new org, a new org admin, and registers the org with the A server.
 
 ```json
 {
- "username": "OrgAdmin",
- "password": "foobar",
- "pwdconfirm": "foobar",
- "signuptoken": "48ea8317920bb268ebc7739c8ecee4c5"
+  "email": "neworg@example.com",
+  "name": "New Org, LLC",
+  "password": "foobar",
+  "password_confirmation": "foobar",
+  "apikey": "not required unless name is blank",
+  "terms_urls": "https://terms.jlinc.org",
+  "stripe_token": "tok_1CR5JRFNXsZIJI8lCl1l04S4",
+  "salesforce": "boolean whether org has a Salesforce connection"
 }
+
 ```
 
-Usernames are converted to lowercase for both registration and login.  
-On success the lowercased username will be returned:
+Returns a session_id for the new org admin, and the org parameters.
 
 ```json
 {
  "success": true,
- "username": "orgadmin"
+ "sessionID": "5e1668d7fffaadabf0474088e...",
+ "organization": "organization details..."
 }
 ```
 
@@ -81,9 +96,34 @@ If the name (after lowercasing) is available (i.e. does not exist), the reply re
 }
 ```
 
+### Adding an org admin to an existing org
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/register_
+
+Requires a signup token created out-of-band
+
+```json
+{
+  "email": "newadmin@example.com",
+  "password": "foobar",
+  "password_confirmation": "foobar",
+  "signuptoken": "5e1668d7fffaadabf0474088e..."
+}
+```
+
+Success returns the email and a session ID:
+
+```json
+{
+ "success": true,
+ "email": "newadmin@example.com",
+ "sessionID": "5e1668d7fffaadabf0474088e..."
+}
+```
+
 ### Logging in an org admin
 
-_POST https://sandbox.b.jlinclabs.net/api/orgs/login
+_POST https://sandbox.b.jlinclabs.net/api/orgs/login_
 
 ```json
 {
@@ -103,7 +143,7 @@ Usernames are lowercased before checking. A successful login returns a session I
 
 ### Verifying a session ID
 
-_POST https://sandbox.b.jlinclabs.net/api/orgs/authn
+_POST https://sandbox.b.jlinclabs.net/api/orgs/authn_
 
 ```json
 {
@@ -121,7 +161,7 @@ If the session is valid, updates the session time-to-live and returns true. Othe
 
 ### Logging out an org admin
 
-_POST https://sandbox.b.jlinclabs.net/api/orgs/logout
+_POST https://sandbox.b.jlinclabs.net/api/orgs/logout_
 
 ```json
 {
@@ -134,5 +174,124 @@ If the session exists and has been destroyed returns true.
 ```json
 {
  "success": true
+}
+```
+
+### Getting an organization profile
+
+_GET https://sandbox.b.jlinclabs.net/api/orgs/profile/{session_id}_
+
+Requires a valid org admin session id.
+
+Returns the organization's details.
+
+```json
+{
+ "success": true,
+  "apikey": "neworgllc",
+  "name": "New Org, LLC",
+  "dpo_email": "dpo@example.com",
+  "etc": "..."
+}
+```
+
+### Updating an organization profile
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/profile_
+
+Requires a valid org admin session id, and an object containing the updated org profile fields:values.
+
+```json
+{
+ "session_id": "5e1668d7fffaadabf0474088e...",
+ "organization_profile": "..."
+}
+```
+
+Updates the A and B servers with the new fields, and returns the organizations details.
+
+```json
+{
+ "success": true,
+  "apikey": "neworgllc",
+  "name": "New Org, LLC",
+  "dpo_email": "dpo@example.com",
+  "etc": "..."
+}
+```
+
+### Getting a consent report
+
+_GET https://sandbox.b.jlinclabs.net/api/orgs/consent_report/{session_id}_
+
+Requires a valid org admin session id.
+
+Returns a consent report (a sorted list of transaction events) for the current point in time.
+
+```json
+{
+ "success": true,
+ "consentReport": "consent report details..."
+}
+```
+
+### Creating an end-user invitation URL
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/invite_end_user_
+
+Requires a valid org admin session id and an email address.
+
+```json
+{
+ "session_id": "5e1668d7fffaadabf0474088e...",
+ "email": "enduser@example.com"
+}
+```
+
+Returns a signup URL for transmission to the invitee.
+
+```json
+{
+ "success": true,
+ "signup": "https://a.jlinclabs.net/regauth/gbobcog690bcd707..."
+}
+```
+
+### Creating multiple end-user invitation URLs from a CSV file
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/invite_end_user_batch_
+
+Requires submitting a multipart/form-data form with a text (should be hidden) `session_id` field containing
+a valid org admin session id, and field of type "file" named `emailListCSVStream` containing the CSV file.
+
+Returns an `invites.csv` file with the signup URLs.
+
+### Get all the end-user account data for an org
+
+_GET https://sandbox.b.jlinclabs.net/api/end_user_account_data/{session_id}
+
+Requires a valid org admin session id.
+
+Returns an array of end-user account data.
+
+```json
+{
+ "success": true,
+ "allEndUserAccountData": ["..."]
+}
+```
+
+### Get one end-user's account data
+
+_GET https://sandbox.b.jlinclabs.net/api/end_user_account_data/{rhldr_id}/{session_id}
+
+Requires a rights-holder (i.e. end-user) id and a valid org admin session id.
+
+Returns the end-user account data.
+
+```json
+{
+ "success": true,
+ "endUserAccountData": "..."
 }
 ```

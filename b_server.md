@@ -244,48 +244,6 @@ If the session exists and has been destroyed returns true.
 }
 ```
 
-### Getting an organization profile
-
-_GET https://sandbox.b.jlinclabs.net/api/orgs/profile/{session_id}_
-
-Requires a valid org admin session id.
-
-Returns the organization's details.
-
-```json
-{
- "success": true,
-  "apikey": "neworgllc",
-  "name": "New Org, LLC",
-  "dpo_email": "dpo@example.com",
-  "etc": "..."
-}
-```
-
-### Updating an organization profile
-
-_POST https://sandbox.b.jlinclabs.net/api/orgs/profile_
-
-Requires a valid org admin session id, and an object containing the updated org profile fields:values.
-
-```json
-{
- "session_id": "5e1668d7fffaadabf0474088e...",
- "organization_profile": "..."
-}
-```
-
-Updates the A and B servers with the new fields, and returns the organizations details.
-
-```json
-{
- "success": true,
-  "apikey": "neworgllc",
-  "name": "New Org, LLC",
-  "dpo_email": "dpo@example.com",
-  "etc": "..."
-}
-```
 
 ### Getting a consent report
 

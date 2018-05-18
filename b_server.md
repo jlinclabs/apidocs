@@ -159,6 +159,73 @@ If the session is valid, updates the session time-to-live and returns true. Othe
 }
 ```
 
+### Getting org profile data
+
+_GET https://sandbox.b.jlinclabs.net/api/orgs/profile/:sessionID_
+
+If the session ID is valid the organization profile data will be returned:
+```json
+  "success": true,
+  "organization_profile": {
+    "apikey": "bobco",
+    "logo": "data:image/gif;base64,R0lGODlhPQBEAPeoAJosM//AwO/…",
+    "icon": "data:image/gif;base64,R0lGODlhPQBEAPeoAJosM//AwO/…",
+    "name": "Bob & Co",
+    "dpo_email": "bobco@earthlingsunited.org",
+    "domain": "endpotatoefamine.com",
+    "contact_phone": "55555555555",
+    "contact_phone2": "5555555555",
+    "address": "83rd city ave",
+    "city": "Megatropolis",
+    "post_code": "84594",
+    "country": "The One True Country"
+  }
+```
+
+### Updating org profile data
+
+_POST https://sandbox.b.jlinclabs.net/api/orgs/profile_
+
+```json
+  "session_id": "i4uthu749489844f…",
+  "organization_profile": {
+    "apikey": "bobco",
+    "logo": "data:image/gif;base64,R0lGODlhPQBEAPeoAJosM//AwO/…",
+    "icon": "data:image/gif;base64,R0lGODlhPQBEAPeoAJosM//AwO/…",
+    "name": "Bob & Co",
+    "dpo_email": "bobco@earthlingsunited.org",
+    "domain": "endpotatoefamine.com",
+    "contact_phone": "55555555555",
+    "contact_phone2": "5555555555",
+    "address": "81st city ave",
+    "city": "Megatropolis",
+    "post_code": "84592",
+    "country": "The One True Earth"
+  }
+```
+
+If the session ID is valid, updates the organization profile, then returns true and the updated profile data.
+
+```json
+{
+  "success": true,
+  "organization_profile": {
+    "apikey": "bobco",
+    "logo": "data:image/gif;base64,R0lGODlhPQBEAPeoAJosM//AwO/…",
+    "icon": "data:image/gif;base64,R0lGODlhPQBEAPeoAJosM//AwO/…",
+    "name": "Bob & Co",
+    "dpo_email": "bobco@earthlingsunited.org",
+    "domain": "endpotatoefamine.com",
+    "contact_phone": "55555555555",
+    "contact_phone2": "5555555555",
+    "address": "81st city ave",
+    "city": "Megatropolis",
+    "post_code": "84592",
+    "country": "The One True Earth"
+  }
+}
+```
+
 ### Logging out an org admin
 
 _POST https://sandbox.b.jlinclabs.net/api/orgs/logout_

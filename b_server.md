@@ -13,6 +13,7 @@ If the server is responding returns:
   "status": "OK"
 }
 ```
+{% include starsep.html %}
 
 ### Onboarding a new user
 This is an API to create a signup link that BobCo can send to Alice, inviting her to take charge of the contact information he has about her, and set her preferences about what he can do with it.
@@ -53,6 +54,8 @@ On success a signup link will be returned:
 
 This link should be sent to Alice to register her account with BobCo.
 
+{% include starsep.html %}
+
 ### Creating a new org
 
 _POST https://sandbox.b.jlinclabs.net/api/orgs/create_
@@ -83,6 +86,8 @@ Returns a session_id for the new org admin, and the org parameters.
 }
 ```
 
+{% include starsep.html %}
+
 ### Checking whether an org admin username is already in use
 
 _GET https://sandbox.b.jlinclabs.net/api/orgs/exists/{name-to-check}_
@@ -95,6 +100,7 @@ If the name (after lowercasing) is available (i.e. does not exist), the reply re
  "result": false
 }
 ```
+{% include starsep.html %}
 
 ### Adding an org admin to an existing org
 
@@ -121,6 +127,8 @@ Success returns the email and a session ID:
 }
 ```
 
+{% include starsep.html %}
+
 ### Logging in an org admin
 
 _POST https://sandbox.b.jlinclabs.net/api/orgs/login_
@@ -141,6 +149,8 @@ Usernames are lowercased before checking. A successful login returns a session I
 }
 ```
 
+{% include starsep.html %}
+
 ### Verifying a session ID
 
 _POST https://sandbox.b.jlinclabs.net/api/orgs/authn_
@@ -158,6 +168,8 @@ If the session is valid, updates the session time-to-live and returns true. Othe
  "success": true
 }
 ```
+
+{% include starsep.html %}
 
 ### Getting org profile data
 
@@ -181,6 +193,8 @@ If the session ID is valid the organization profile data will be returned:
     "country": "The One True Country"
   }
 ```
+
+{% include starsep.html %}
 
 ### Updating org profile data
 
@@ -226,6 +240,8 @@ If the session ID is valid, updates the organization profile, then returns true 
 }
 ```
 
+{% include starsep.html %}
+
 ### Logging out an org admin
 
 _POST https://sandbox.b.jlinclabs.net/api/orgs/logout_
@@ -244,6 +260,7 @@ If the session exists and has been destroyed returns true.
 }
 ```
 
+{% include starsep.html %}
 
 ### Getting a consent report
 
@@ -259,6 +276,8 @@ Returns a consent report (a sorted list of transaction events) for the current p
  "consentReport": "consent report details..."
 }
 ```
+
+{% include starsep.html %}
 
 ### Creating an end-user invitation URL
 
@@ -282,6 +301,8 @@ Returns a signup URL for transmission to the invitee.
 }
 ```
 
+{% include starsep.html %}
+
 ### Creating multiple end-user invitation URLs from a CSV file
 
 _POST https://sandbox.b.jlinclabs.net/api/orgs/invite_end_user_batch_
@@ -290,6 +311,8 @@ Requires submitting a multipart/form-data form with a text (should be hidden) `s
 a valid org admin session id, and field of type "file" named `emailListCSVStream` containing the CSV file.
 
 Returns an `invites.csv` file with the signup URLs.
+
+{% include starsep.html %}
 
 ### Get all the end-user account data for an org
 
@@ -305,6 +328,8 @@ Returns an array of end-user account data.
  "allEndUserAccountData": ["..."]
 }
 ```
+
+{% include starsep.html %}
 
 ### Get one end-user's account data
 

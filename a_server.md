@@ -139,6 +139,355 @@ On success it returns just:
 
 {% include starsep.html %}
 
+### Getting info on a user's vendors
+
+_GET https://sandbox.a.jlinclabs.net/api/organizations/{loginToken}_
+
+Returns an array of vendor information objects:
+```json
+{
+ "success": true,
+ "organizations":[
+   {"vendor_name":"detailing",
+    "public_key":"4tx0UNxZwTDo62CQ...",
+    "logo":"data:image/jpeg;base64...",
+    "icon":"data:image/jpeg;base64...",
+    "name":"Alchemist Detailing",
+    "dpo_email":"dpo@alchemist.co.uk",
+    "domain":"Alchemist.org",
+    "contact_phone":"2345678",
+    "contact_phone_2":"4567879",
+    "address":"...",
+    "city":"...",
+    "post_code":"...",
+    "country":"...",
+    "consents":[
+      {"title":"Product Interest",
+       "enabled":true,
+       "description":"..."}
+    ],
+    "communication_channels":
+      {"fax_media":false,
+       "sms_media":true,
+       "email_media":true,
+       "..."},
+    "requested_data":
+      {"email":true,
+      "lastname":true,
+      "firstname":true,
+       "..."},
+    "isa_terms_text":"..."
+  },
+  {"..."}
+ ]
+}
+
+```
+
+{% include starsep.html %}
+
+### Getting account data for a user from a particular vendor
+
+_GET https://sandbox.a.jlinclabs.net/api/organizations/{organizationPublicKey}/{loginToken}_
+
+Returns vendor settings from vendor for this user
+```json
+{
+  "success": true,
+  "organizationAccountData": {
+    "shared_personal_data": {
+      "email": true,
+      "gender": true,
+      "lastname": true,
+      "birthdate": true,
+      "firstname": true,
+      "homephone": true,
+      "mailingcity": true,
+      "mobilephone": true,
+      "businessphone": true,
+      "mailingstreet": true,
+      "mailingcountry": true,
+      "mailingpostalcode": true
+    },
+    "personal_data": {
+      "firstname": "Some",
+      "lastname": "User",
+      "mailingstreet": null,
+      "mailingcity": null,
+      "mailingpostalcode": null,
+      "mailingcountry": null,
+      "homephone": null,
+      "mobilephone": null,
+      "email": "",
+      "birthdate": "",
+      "businessphone": "",
+      "gender": ""
+    },
+    "consents": {},
+    "communication_channels": {}
+  },
+  "success": true
+}
+
+```
+
+{% include starsep.html %}
+
+### Updating account data for a user from a particular vendor
+
+_POST https://sandbox.a.jlinclabs.net/api/organizations/accountData_
+```json
+{
+ "loginToken": "de7a126fef783bd6d9ac1da48cada93ee",
+ "organizationPublicKey":"XxnnSLWq..."
+ "organizationAccountData":
+   {"personal_data": {
+     "firstname":"Some",
+     "lastname":"User",
+     "email":"someone@example.com"
+     }
+   }
+}
+```
+Returns the updated account data:
+
+```json
+{
+  "success": true,
+  "organizationAccountData": {
+    "consents": {},
+    "communication_channels": {},
+    "shared_personal_data": {
+      "email": true,
+      "gender": true,
+      "lastname": true,
+      "birthdate": true,
+      "firstname": true,
+      "homephone": true,
+      "mailingcity": true,
+      "mobilephone": true,
+      "businessphone": true,
+      "mailingstreet": true,
+      "mailingcountry": true,
+      "mailingpostalcode": true
+    },
+    "personal_data": {
+      "firstname": "Some",
+      "lastname": "User",
+      "mailingstreet": null,
+      "mailingcity": null,
+      "mailingpostalcode": null,
+      "mailingcountry": null,
+      "homephone": null,
+      "mobilephone": null,
+      "email": "someone@example.com",
+      "birthdate": "",
+      "businessphone": "",
+      "gender": ""
+    }
+  }
+}
+
+```
+
+{% include starsep.html %}
+
+### Getting user's default account data
+
+_GET https://sandbox.a.jlinclabs.net/api/default-account-data/{loginToken}_
+
+Returns the user's default account data:
+
+```json
+{
+  "success": true,
+  "defaultAccountData": {
+    "shared_personal_data": {
+      "email": true,
+      "gender": true,
+      "lastname": true,
+      "birthdate": true,
+      "firstname": true,
+      "homephone": true,
+      "mailingcity": true,
+      "mobilephone": true,
+      "businessphone": true,
+      "mailingstreet": true,
+      "mailingcountry": true,
+      "mailingpostalcode": true
+    },
+    "personal_data": {
+      "birthdate": "",
+      "businessphone": "",
+      "email": "someone@example.com",
+      "firstname": "Some",
+      "gender": "",
+      "homephone": "",
+      "lastname": "User",
+      "mailingcity": "",
+      "mailingcountry": "USA",
+      "mailingpostalcode": "",
+      "mailingstreet": "",
+      "mobilephone": ""
+    },
+    "consents": {},
+    "communication_channels": {
+      "email_media": {
+        "enabled": true
+      }
+    }
+  }
+}
+
+```
+
+{% include starsep.html %}
+
+### Updating user's default account data
+
+_POST https://sandbox.a.jlinclabs.net/api/default-account-data_
+```json
+{
+  "loginToken": "de7a126fef783bd6d9ac1da48cada93ee",
+  "defaultAccountData": {
+    "personal_data": {
+      "email": "no-one@example.com",
+      "firstname": "Some",
+      "lastname": "User"
+    }
+  }
+}
+```
+
+Returns updated default account data:
+
+```json
+{
+  "success": true,
+  "defaultAccountData": {
+    "shared_personal_data": {
+      "email": true,
+      "gender": true,
+      "lastname": true,
+      "birthdate": true,
+      "firstname": true,
+      "homephone": true,
+      "mailingcity": true,
+      "mobilephone": true,
+      "businessphone": true,
+      "mailingstreet": true,
+      "mailingcountry": true,
+      "mailingpostalcode": true
+    },
+    "personal_data": {
+      "birthdate": "",
+      "businessphone": "",
+      "email": "no-one@example.com",
+      "firstname": "Some",
+      "gender": "",
+      "homephone": "",
+      "lastname": "User",
+      "mailingcity": "",
+      "mailingcountry": "USA",
+      "mailingpostalcode": "",
+      "mailingstreet": "",
+      "mobilephone": ""
+    },
+    "consents": {},
+    "communication_channels": {
+      "email_media": {
+        "enabled": true
+      }
+    }
+  }
+}
+```
+
+
+
+
+{% include starsep.html %}
+
+### Getting user's data event receipts for an organization
+
+_GET https://sandbox.a.jlinclabs.net/api/organizations/receipts/{organizationPublicKey}/{loginToken}
+
+Retrieves a list of data event receipts:
+
+```json
+{
+  "success": true,
+  "organizationReceipts": [
+    {
+      "DataTS": 1526773050471,
+      "ISAHash": "-dALrL3xzqDH67z5UUmI...",
+      "Version": "0.5",
+      "@context": "https://jlinc.org/v05/context/isa-rcpt.jsonld",
+      "DataHash": "RbvXJozWvZq9I0RkVQSw...",
+      "DcustSig": "j5Ex35_8qcnrgLHIftqT...",
+      "RhldrSig": "aOQk91eBoNBFm0_C-RJB...",
+      "DcustPkID": "4tx0UNxZwTDo62CQcQb...",
+      "RhldrPkID": "oWUU5SdI4M0FZxGatfl...",
+      "DcustPkAlg": "sha256:ed25519",
+      "id": 291,
+      "created": "2018-05-19T23:37:30.698Z",
+      "subject_data": {
+        "personal_data": {
+          "email": "someone@example.com",
+          "lastname": "User",
+          "firstname": "Some"
+        }
+      },
+      "organizationPublicKey": "4tx0UNxZwTDo62CQcQbZ..."
+    },
+    {"..."},
+    {"..."}
+  ]
+}
+```
+
+{% include starsep.html %}
+
+### Getting organization data with its API key
+
+_GET https://sandbox.a.jlinclabs.net/api/organization/{apikey}
+
+Returns org data:
+```json
+{
+ "success": true,
+ "organization":
+   {
+    "name":"Alchemist Detailing",
+    "logo":"data:image/jpeg;base64...",
+    "icon":"data:image/jpeg;base64...",
+    "dpo_email":"dpo@alchemist.co.uk",
+    "domain":"Alchemist.org",
+    "contact_phone":"2345678",
+    "address":"...",
+    "city":"...",
+    "post_code":"...",
+    "country":"...",
+   }
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ########obsolete
+
+
 ### Obtaining the vendor list
 In order to retrieve vendor specific information for the user, you must provide both a login token and a vendor public key.
 
@@ -456,3 +805,5 @@ Receipts are always sorted by creation date/time, with the newest at the top.
 
 Example:  
 _GET https://.../api/remotedata/rcptsdata/.../...?page=2&num=20_
+
+-->

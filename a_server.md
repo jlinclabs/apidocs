@@ -76,9 +76,9 @@ The user is now logged in and can move to the logged-in user menu items.
 ##### N.B. The user's first access to their account data pulls that data from the B server. Until that happens their account data does not exist on the A server.
 ##### Once they have made that initial access, the user has taken control of their data on the B server, and subsequent updates of that data will be pushed to the B server if the user's permissions allow it.
 
-#### Signing up an existing user with a new vendor
+#### Signing up an existing user with a new organization (aka vendor)
 
-Obtain a signuptoken as above. On the registration form page, offer the user the alternative to add this vendor to an existing account by logging into the existing account.
+Obtain a signuptoken as above. On the registration form page, offer the user the alternative to add this organization to an existing account by logging into the existing account.
 
 That login form should target /api/authn/register_add with the username, passphrase and signuptoken:  
 _POST https://sandbox.a.jlinclabs.net/api/authn/register_add_
@@ -91,7 +91,7 @@ _POST https://sandbox.a.jlinclabs.net/api/authn/register_add_
 }
 ```
 
-On success the A server will return a login token and a `vendorPk` public key, which can be used to redirect the user to the new vendor's page..
+On success the A server will return a login token and a `vendorPk` public key, which can be used to redirect the user to the new organization's page..
 
 ```json
 {
@@ -139,11 +139,11 @@ On success it returns just:
 
 {% include starsep.html %}
 
-### Getting info on a user's vendors
+### Getting info on a user's organizations
 
 _GET https://sandbox.a.jlinclabs.net/api/organizations/{loginToken}_
 
-Returns an array of vendor information objects:
+Returns an array of organization information objects:
 ```json
 {
  "success": true,
@@ -186,11 +186,11 @@ Returns an array of vendor information objects:
 
 {% include starsep.html %}
 
-### Getting account data for a user from a particular vendor
+### Getting account data for a user from a particular organization
 
 _GET https://sandbox.a.jlinclabs.net/api/organizations/{organizationPublicKey}/{loginToken}_
 
-Returns vendor settings from vendor for this user
+Returns organization settings for this user
 ```json
 {
   "success": true,
@@ -233,7 +233,7 @@ Returns vendor settings from vendor for this user
 
 {% include starsep.html %}
 
-### Updating account data for a user from a particular vendor
+### Updating account data for a user from a particular organization
 
 _POST https://sandbox.a.jlinclabs.net/api/organizations/accountData_
 ```json

@@ -3,6 +3,18 @@ layout: default
 ---
 ## The A server
 
+### Server status
+_GET https://sandbox.a.jlinclabs.net/status_
+
+If the server is responding returns:
+
+```json
+{
+  "status": "OK"
+}
+```
+{% include starsep.html %}
+
 ### Using signup URLs
 When the front-end regauth page is accessed by a signup url, for example:  
 _https://alpha.userprefs.com/regauth/65c29f1ff4975dff_  

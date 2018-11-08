@@ -1,821 +1,728 @@
 ---
 layout: default
 ---
-## The A server
+
+# The A API Server
+
+## Unauthenticated Requests
 
 ### Server status
-_GET https://sandbox.a.jlinclabs.net/status_
 
-If the server is responding returns:
+Endpoint:
+```
+GET /status
+```
 
+Response body:
 ```json
 {
   "status": "OK"
 }
 ```
-{% include starsep.html %}
 
-### Using signup URLs
-When the front-end regauth page is accessed by a signup url, for example:  
-_https://alpha.userprefs.com/regauth/65c29f1ff4975dff_  
-the regauth page should put up a "please wait - this may take a few moments" type notice and then extract the token from the url to call the A server
 
-_POST https://sandbox.a.jlinclabs.net/api/register/new_
+### Signup
 
+Endpoint:
+```
+POST /api/signup
+```
+
+Post body:
 ```json
 {
- "token": "65c29f1ff4975dff"
+  "email": "example@example.com",
+  "password": "Pa$$w0rd",
+  "passwordConfirmation": "Pa$$w0rd",
+  "keepMeLoggedIn": true,
+  "destinationPath": "/"
 }
 ```
 
-The A server will verify the token with the B server, and then return a `signup` token.
+_`destinationPath` is used to store where the user was trying to go
+before signing up so they can be redirected there after completing
+their signup via the link in their email_
 
+Response body:
 ```json
 {
- "success": true,
- "signuptoken": "ec281d5348c24ed0d8637297ed9faad4"
+  "success": true
 }
 ```
 
-Store the `signuptoken` and redirect the user to the registration form.
+At this point an email will be sent to the given email address.
+The email will contain a link that will verify the the given email.
 
-If the user submits a token that has already been used, the `signuptoken` field will have `existing` instead of a hex value. In that case redirect the user to the login page.
+This is an exmple of that link:
+_https://sandbox.jlinclabs.net/verify/13j0f49fefe2e1b7_
 
+You can verify your email via this API using the [Complete Signup](#complete-signup)
+endpoint and the token embeded in the url.
+
+<a name="complete-signup"></a>
+### Complete Signup
+
+Endpoint:
+```
+POST /api/complete_signup
+```
+
+Post body:
 ```json
 {
- "success": true,
- "signuptoken": "existing"
+  "emailVerificationCode": "13j0f49fefe2e1b7"
 }
 ```
 
-{% include starsep.html %}
-
-### Registering a new user
-When a prospective new user arrives at the app's registration page with a signuptoken, as above, they should be presented with a form asking for an email address to use as a username, and passphrase and passphrase confirmation fields.
-
-The app then submits the form data and the signuptoken to the A server.
-
-_POST https://sandbox.a.jlinclabs.net/api/authn/register_
-```json
-{
- "username": "alice@example.com",
- "passphrase": "foobar",
- "passphrase2": "foobar",
- "signuptoken": "ec281d5348c24ed0d8637297ed9faad4"
-}
-```
-
-On success it returns data (explained below);
-```json
-{
- "success": true,
- "user": {
-  "account_id": "DA9yqCMEff5SV7fJvP51Vj44eZGts5nwkHrPp4D_8bQ",
-  "username": "alice@example.com"
- },
- "nicepwd": "loader woodlot synthesizing sharp dative sativa",
- "logintoken": "6f81124583a583034df88a9664891a8b",
- "vendorname": "bobco",
- "vendor_pk": "Xp0A5Jj9wb1QpVSU0u8hhbks3FWcrgU1I3RZmghfNkU"
-}
-```
-The `user:account_id` is a public key that has been assigned to this user.  
-The `nicepwd` is a recovery key - you want to display that to them and encourage them to print it out and save it in a secure place.
-
-Store the `logintoken`, `vendorname` and `vendor_pk` (the vendor's public key).  
-The user is now logged in and can move to the logged-in user menu items.
-
-##### N.B. The user's first access to their account data pulls that data from the B server. Until that happens their account data does not exist on the A server.
-##### Once they have made that initial access, the user has taken control of their data on the B server, and subsequent updates of that data will be pushed to the B server if the user's permissions allow it.
-
-#### Signing up an existing user with a new organization (aka vendor)
-
-Obtain a signuptoken as above. On the registration form page, offer the user the alternative to add this organization to an existing account by logging into the existing account.
-
-That login form should target /api/authn/register_add with the username, passphrase and signuptoken:  
-_POST https://sandbox.a.jlinclabs.net/api/authn/register_add_
-
-```json
-{
- "username": "alice@example.com",
- "passphrase": "foobar",
- "signuptoken": "ec281d5348c24ed0d8637297ed9faad4"
-}
-```
-
-On success the A server will return a login token and a `vendorPk` public key, which can be used to redirect the user to the new organization's page..
-
-```json
-{
- "success": true,
- "logintoken": "6f81124583a583034df88a9664891a8b",
- "vendorPk": "JC0W885tID6b71XJ915uq-Ktqf9OFJgbu3iBNQ1IHnI"
-}
-```
-
-
-{% include starsep.html %}
-
-### Re-logging in
-
-_POST https://sandbox.a.jlinclabs.net/api/authn/login_
-```json
-{
- "username": "alice@example.com",
- "passphrase": "foobar"
-}
-```
-On success it returns
-```json
-{
- "success": true,
- "token": "de7a126fef783bd6d9ac1da48cada93ee"
-}
-```
-
-{% include starsep.html %}
-
-### Logging out
-_POST https://sandbox.a.jlinclabs.net/api/authn/logout_
-```json
-{
- "token": "de7a126fef783bd6d9ac1da48cada93ee"
-}
-```
-On success it returns just:
-```json
-{
- "success": true
-}
-```
-
-{% include starsep.html %}
-
-### Getting info on a user's organizations
-
-_GET https://sandbox.a.jlinclabs.net/api/organizations/{loginToken}_
-
-Returns an array of organization information objects:
-```json
-{
- "success": true,
- "organizations":[
-   {"vendor_name":"detailing",
-    "public_key":"4tx0UNxZwTDo62CQ...",
-    "logo":"data:image/jpeg;base64...",
-    "icon":"data:image/jpeg;base64...",
-    "name":"Alchemist Detailing",
-    "dpo_email":"dpo@alchemist.co.uk",
-    "domain":"Alchemist.org",
-    "contact_phone":"2345678",
-    "contact_phone_2":"4567879",
-    "address":"...",
-    "city":"...",
-    "post_code":"...",
-    "country":"...",
-    "consents":[
-      {"title":"Product Interest",
-       "enabled":true,
-       "description":"..."}
-    ],
-    "communication_channels":
-      {"fax_media":false,
-       "sms_media":true,
-       "email_media":true,
-       "..."},
-    "requested_data":
-      {"email":true,
-      "lastname":true,
-      "firstname":true,
-       "..."},
-    "isa_terms_text":"..."
-  },
-  {"..."}
- ]
-}
-
-```
-
-{% include starsep.html %}
-
-### Getting account data for a user from a particular organization
-
-_GET https://sandbox.a.jlinclabs.net/api/organizations/{organizationPublicKey}/{loginToken}_
-
-Returns organization settings for this user
+Response body:
 ```json
 {
   "success": true,
-  "organizationAccountData": {
-    "shared_personal_data": {
-      "email": true,
-      "gender": true,
-      "lastname": true,
-      "birthdate": true,
-      "firstname": true,
-      "homephone": true,
-      "mailingcity": true,
-      "mobilephone": true,
-      "businessphone": true,
-      "mailingstreet": true,
-      "mailingcountry": true,
-      "mailingpostalcode": true
-    },
-    "personal_data": {
-      "firstname": "Some",
-      "lastname": "User",
-      "mailingstreet": null,
-      "mailingcity": null,
-      "mailingpostalcode": null,
-      "mailingcountry": null,
-      "homephone": null,
-      "mobilephone": null,
-      "email": "",
-      "birthdate": "",
-      "businessphone": "",
-      "gender": ""
-    },
+  "sessionId": "305e7cca1f2db7faf6353e00ed043186",
+  "email": "newuser002@example.com",
+  "destinationPath": "/"
+}
+```
+
+The `sessionId` provided in the response should be used as the value of the
+`Session-Id` header in [authenticated requests](#authenticated-requests).
+
+
+<a name="login"></a>
+
+### Login
+
+Endpoint:
+```
+POST /api/login
+```
+
+Post body:
+```json
+{
+  "email": "example@example.com",
+  "password": "Pa$$w0rd",
+  "keepMeLoggedIn":true
+}
+```
+
+Response body:
+
+```json
+{
+  "sessionId": "c97cb8cd5cc19177d4db61882ee258df",
+  "success": true
+}
+```
+
+The `sessionId` provided in the response should be used as the value of the
+`Session-Id` header in [authenticated requests](#authenticated-requests).
+
+<a name="request-password-reset-email"></a>
+
+### Request Password Reset Email
+
+Endpoint:
+```
+POST /api/reset_password/request
+```
+
+Post body:
+```json
+{
+  "email": "example@example.com"
+}
+```
+
+Response body:
+
+```json
+{
+  "success": true
+}
+```
+
+At this point an email is sent to the user with a link that ends with the
+`resetPasswordToken` required by the [Reset Password](#reset-password) endpoint.
+
+<a name="reset-password"></a>
+
+### Reset Password
+
+Endpoint:
+```
+POST /api/reset_password
+```
+
+Post body:
+```json
+{
+  "resetPasswordToken": "GET_THIS_FROM_YOUR_EMAIL",
+  "password": "newPassword",
+  "passwordConfirmation": "newPassword"
+}
+```
+
+Response body:
+
+```json
+{
+  "success": true
+}
+```
+
+<a name="authenticated-requests"></a>
+
+## Authenticated Requests
+
+
+Authenticated Requests require that you define the header `Session-Id`.
+The value should be the `sessionId` provided by a [Login](#login) request.
+
+<a name="logout"></a>
+
+### Logout
+
+Endpoint:
+```
+POST /api/logout
+```
+
+Post body:
+```json
+{}
+```
+
+Response body:
+
+```json
+{
+  "success": true
+}
+```
+
+### Get Default Account Data
+
+Endpoint:
+```
+GET /api/default-account-data
+```
+
+Response body:
+
+```json
+{
+  "success": true,
+  "defaultAccountData": {
+    "shared_personal_data": {},
+    "personal_data": {},
+    "consents": {},
+    "communication_channels": {}
+  }
+}
+```
+
+
+### Update Default Account Data
+
+Endpoint:
+```
+POST /api/default-account-data
+```
+
+Post body:
+```json
+{
+  "defaultAccountData": {
+    "shared_personal_data": {},
+    "personal_data": {},
+    "consents": {},
+    "communication_channels": {}
+  }
+}
+```
+
+Response body:
+```json
+{
+  "success": true,
+  "defaultAccountData": {
+    "shared_personal_data": {},
+    "personal_data": {},
+    "consents": {},
+    "communication_channels": {}
+  }
+}
+```
+
+
+### Get Overview
+
+Endpoint:
+```
+GET /api/overview
+```
+
+Response body:
+
+```json
+{
+  "success": true,
+  "sisas": [],
+  "myOrganizations": {},
+  "recentSisaEvents": [],
+  "defaultAccountData": {
+    "shared_personal_data": {},
+    "personal_data": {},
     "consents": {},
     "communication_channels": {}
   },
-  "success": true
+  "preferences": {}
 }
-
 ```
 
-{% include starsep.html %}
+## Update Preferences
 
-### Updating account data for a user from a particular organization
+Endpoint:
+```
+POST /api/preferences
+```
 
-_POST https://sandbox.a.jlinclabs.net/api/organizations/accountData_
+Post body:
 ```json
 {
- "loginToken": "de7a126fef783bd6d9ac1da48cada93ee",
- "organizationPublicKey":"XxnnSLWq..."
- "organizationAccountData":
-   {"personal_data": {
-     "firstname":"Some",
-     "lastname":"User",
-     "email":"someone@example.com"
-     }
-   }
+  "preferences": {
+    "skip_future_view_sisas": true
+  }
 }
 ```
-Returns the updated account data:
 
+Response body:
+```json
+{
+  "success": true,
+  "preferences": {
+    "skip_future_view_sisas": true
+  }
+}
+```
+
+### Get All Organizations
+
+Endpoint:
+```
+GET /api/organizations
+```
+
+Response body:
+
+```json
+{
+  "success": true,
+  "organizations": [
+    {
+      "apikey": "jlinclabs",
+      "public_key": "",
+      "logo": "",
+      "icon": "",
+      "banner": "",
+      "name": "JLINC Labs",
+      "dpo_email": "dpo@jlinclabs.com",
+      "domain": "jlinclabs.com",
+      "contact_phone": "",
+      "contact_phone_2": "",
+      "address": "",
+      "city": "",
+      "post_code": "",
+      "country": "",
+      "consents": {},
+      "communication_channels": {},
+      "requested_data": {},
+      "description": "",
+      "upsell_description": "",
+      "state": "",
+      "public": true,
+      "marketplace_tags": []
+    }
+  ]
+}
+```
+
+### Get A Single Organization
+
+Endpoint:
+```
+GET /api/organizations/:organizationApikey
+```
+
+Response body:
+
+```json
+{
+  "success": true,
+  "organization": {
+    "apikey": "jlinclabs",
+    "public_key": "",
+    "logo": "",
+    "icon": "",
+    "banner": "",
+    "name": "JLINC Labs",
+    "dpo_email": "dpo@jlinclabs.com",
+    "domain": "jlinclabs.com",
+    "contact_phone": "",
+    "contact_phone_2": "",
+    "address": "",
+    "city": "",
+    "post_code": "",
+    "country": "",
+    "consents": {},
+    "communication_channels": {},
+    "requested_data": {},
+    "description": "",
+    "upsell_description": "",
+    "state": "",
+    "public": true,
+    "marketplace_tags": []
+  }
+}
+```
+
+### Sign A SISA with an Organization
+
+Endpoint:
+```
+POST /api/sign_sisa
+```
+
+Post body:
+```json
+{
+  "organizationApikey": "jlinclabs"
+}
+```
+
+Response body:
+```json
+{
+  "success": true,
+  "sisa": {
+    "@context": "https://protocol.jlinc.org/context/jlinc-v6.jsonld",
+    "sisaId": "",
+    "acceptedSisa": {
+      "@context": "https://protocol.jlinc.org/context/jlinc-v6.jsonld",
+      "rightsHolderSigType": "sha256:ed25519",
+      "rightsHolderId": "",
+      "rightsHolderSig": "",
+      "createdAt": "",
+      "offeredSisa": {
+        "@context": "https://protocol.jlinc.org/context/jlinc-v6.jsonld",
+        "dataCustodianSigType": "sha256:ed25519",
+        "dataCustodianId": "",
+        "dataCustodianSig": "",
+        "createdAt": "",
+        "agreement": {
+          "@context": "https://protocol.jlinc.org/context/jlinc-v6.jsonld",
+          "jlincId": "",
+          "agreementURI": "https://sisa.jlinc.org/v1/3b39160c2b9ae7b2ef81c3311c7924f1c4d4fa9ca47cfe7c840c9852b50d68d5"
+        }
+      }
+    },
+    "organizationApikey": "jlinclabs"
+  },
+  "organizationAccountData": {
+    "consents": {},
+    "communication_channels": {},
+    "shared_personal_data": {},
+    "personal_data": {}
+  },
+  "organization": {}
+}
+```
+
+_For more information in the `sisa` object please see the
+[JLINC Protocl](‭https://protocol.jlinc.org) documentation._
+
+### Get Your Account Data for an Organization
+
+Endpoint:
+```
+GET /api/organizations/accountData/:organizationApikey
+```
+
+Response body:
 ```json
 {
   "success": true,
   "organizationAccountData": {
+    "shared_personal_data": {},
+    "personal_data": {},
     "consents": {},
-    "communication_channels": {},
-    "shared_personal_data": {
-      "email": true,
-      "gender": true,
-      "lastname": true,
-      "birthdate": true,
-      "firstname": true,
-      "homephone": true,
-      "mailingcity": true,
-      "mobilephone": true,
-      "businessphone": true,
-      "mailingstreet": true,
-      "mailingcountry": true,
-      "mailingpostalcode": true
-    },
-    "personal_data": {
-      "firstname": "Some",
-      "lastname": "User",
-      "mailingstreet": null,
-      "mailingcity": null,
-      "mailingpostalcode": null,
-      "mailingcountry": null,
-      "homephone": null,
-      "mobilephone": null,
-      "email": "someone@example.com",
-      "birthdate": "",
-      "businessphone": "",
-      "gender": ""
-    }
+    "communication_channels": {}
   }
 }
-
 ```
 
-{% include starsep.html %}
+### Update Your Account Data for an Organization
 
-### Getting user's default account data
+Endpoint:
+```
+POST /api/organizations/accountData
+```
 
-_GET https://sandbox.a.jlinclabs.net/api/default-account-data/{loginToken}_
+Post body:
+```json
+{
+  "organizationApikeys": [
+    "organizationApikeyOne",
+    "organizationApikeyTwo"
+  ],
+  "changes": {
+    "shared_personal_data": {},
+    "personal_data": {},
+    "consents": {},
+    "communication_channels": {}
+  }
+}
+```
 
-Returns the user's default account data:
-
+Response body:
 ```json
 {
   "success": true,
-  "defaultAccountData": {
-    "shared_personal_data": {
-      "email": true,
-      "gender": true,
-      "lastname": true,
-      "birthdate": true,
-      "firstname": true,
-      "homephone": true,
-      "mailingcity": true,
-      "mobilephone": true,
-      "businessphone": true,
-      "mailingstreet": true,
-      "mailingcountry": true,
-      "mailingpostalcode": true
+  "organizationApikeyOne": {
+    "organizationAccountData": {
+      "shared_personal_data": {},
+      "personal_data": {},
+      "consents": {},
+      "communication_channels": {}
     },
-    "personal_data": {
-      "birthdate": "",
-      "businessphone": "",
-      "email": "someone@example.com",
-      "firstname": "Some",
-      "gender": "",
-      "homephone": "",
-      "lastname": "User",
-      "mailingcity": "",
-      "mailingcountry": "USA",
-      "mailingpostalcode": "",
-      "mailingstreet": "",
-      "mobilephone": ""
-    },
-    "consents": {},
-    "communication_channels": {
-      "email_media": {
-        "enabled": true
-      }
-    }
-  }
-}
-
-```
-
-{% include starsep.html %}
-
-### Updating user's default account data
-
-_POST https://sandbox.a.jlinclabs.net/api/default-account-data_
-```json
-{
-  "loginToken": "de7a126fef783bd6d9ac1da48cada93ee",
-  "defaultAccountData": {
-    "personal_data": {
-      "email": "no-one@example.com",
-      "firstname": "Some",
-      "lastname": "User"
-    }
-  }
-}
-```
-
-Returns updated default account data:
-
-```json
-{
-  "success": true,
-  "defaultAccountData": {
-    "shared_personal_data": {
-      "email": true,
-      "gender": true,
-      "lastname": true,
-      "birthdate": true,
-      "firstname": true,
-      "homephone": true,
-      "mailingcity": true,
-      "mobilephone": true,
-      "businessphone": true,
-      "mailingstreet": true,
-      "mailingcountry": true,
-      "mailingpostalcode": true
-    },
-    "personal_data": {
-      "birthdate": "",
-      "businessphone": "",
-      "email": "no-one@example.com",
-      "firstname": "Some",
-      "gender": "",
-      "homephone": "",
-      "lastname": "User",
-      "mailingcity": "",
-      "mailingcountry": "USA",
-      "mailingpostalcode": "",
-      "mailingstreet": "",
-      "mobilephone": ""
-    },
-    "consents": {},
-    "communication_channels": {
-      "email_media": {
-        "enabled": true
-      }
-    }
-  }
-}
-```
-
-
-
-
-{% include starsep.html %}
-
-### Getting user's data event receipts for an organization
-
-_GET https://sandbox.a.jlinclabs.net/api/organizations/receipts/{organizationPublicKey}/{loginToken}
-
-Retrieves a list of data event receipts:
-
-```json
-{
-  "success": true,
-  "organizationReceipts": [
-    {
-      "DataTS": 1526773050471,
-      "ISAHash": "-dALrL3xzqDH67z5UUmI...",
-      "Version": "0.5",
-      "@context": "https://jlinc.org/v05/context/isa-rcpt.jsonld",
-      "DataHash": "RbvXJozWvZq9I0RkVQSw...",
-      "DcustSig": "j5Ex35_8qcnrgLHIftqT...",
-      "RhldrSig": "aOQk91eBoNBFm0_C-RJB...",
-      "DcustPkID": "4tx0UNxZwTDo62CQcQb...",
-      "RhldrPkID": "oWUU5SdI4M0FZxGatfl...",
-      "DcustPkAlg": "sha256:ed25519",
-      "id": 291,
-      "created": "2018-05-19T23:37:30.698Z",
-      "subject_data": {
-        "personal_data": {
-          "email": "someone@example.com",
-          "lastname": "User",
-          "firstname": "Some"
-        }
-      },
-      "organizationPublicKey": "4tx0UNxZwTDo62CQcQbZ..."
-    },
-    {"..."},
-    {"..."}
-  ]
-}
-```
-
-{% include starsep.html %}
-
-### Getting organization data with its API key
-
-_GET https://sandbox.a.jlinclabs.net/api/organization/{apikey}
-
-Returns org data:
-```json
-{
- "success": true,
- "organization":
-   {
-    "name":"Alchemist Detailing",
-    "logo":"data:image/jpeg;base64...",
-    "icon":"data:image/jpeg;base64...",
-    "dpo_email":"dpo@alchemist.co.uk",
-    "domain":"Alchemist.org",
-    "contact_phone":"2345678",
-    "address":"...",
-    "city":"...",
-    "post_code":"...",
-    "country":"...",
-   }
-}
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- ########obsolete
-
-
-### Obtaining the vendor list
-In order to retrieve vendor specific information for the user, you must provide both a login token and a vendor public key.
-
-To get that vendor key, use this API. It returns a list of vendor choices for this user.  
-The format is /api/vendors/{login_token}
-
-_GET https://sandbox.a.jlinclabs.net/api/vendors/de7a126fef783bd6..._
-
-Which returns:
-
-```json
-{
- "success": true,
- "vendors": [
-   {
-    "vendor_pk": "Xp0A5Jj9wb1QpVSU0u8hhbks3FWcrgU1I3RZmghfNkU",
-    "vendor_name": "bobco"
-   },
-   {
-    "vendor_pk": "V30PBeHuRk90M6K5r7rdLZ2ifMte6hnw2eA0X9uD_78",
-    "vendor_name": "charlieco"
-   }
-  ]
-}
-```
-
-{% include starsep.html %}
-
-### Retrieving user account data
-Send the login token and the vendor public key to /api/remotedata/accountdata/{login_token}/{vendor_pk}
-
-_GET https://sandbox.a.jlinclabs.net/api/remotedata/accountdata/2dfb4668.../XxnnSLWq..._
-
-Returns:
-
-```json
-{
- "success": true,
- "accountData": {
-   "rhldr_id": "DrMVuLh_hUbvrUZt2SZqMFgw1DN9ZQl6OvzgNz9Fo98",
-   "email": "alice@example.com",
-   "firstname": "Alice",
-   "lastname": "McPerson",
-   "mailingstreet": "123 Main Street",
-   "mailingcity": "Oakland",
-   "mailingstate": "CA",
-   "mailingpostalcode": "01234",
-   "mailingcountry": "US",
-   "homephone": "555-111-4444",
-   "mobilephone": "555-111-2222",
-   "birthdate": "2001-08-01",
-   "gender": "female",
-   "email_share": true,
-   "firstname_share": true,
-   "lastname_share": true,
-   "mailingstreet_share": true,
-   "mailingcity_share": true,
-   "mailingstate_share": true,
-   "mailingpostalcode_share": true,
-   "mailingcountry_share": true,
-   "homephone_share": true,
-   "mobilephone_share": true,
-   "birthdate_share": true,
-   "gender_share": true,
-   "all_share": true
- }
-}
-```
-
-The fields ending in "_share" indicate whether the corresponding data field should be shared with the B server, or just retained on the A server.
-
-On first access after a new registration, the data held by the B Server on the new account is returned, along with the "_share" fields defaulted to true. After that the data stored on the local A Server is returned.
-
-If `all_share` is set to false, no updates are shared with the B server, regardless of the settings of the other _share fields.
-
-{% include starsep.html %}
-
-### Editing user account data
-
-_POST https://sandbox.a.jlinclabs.net/api/remotedata/updatecontactdata_
-```json
-{
- "token": "c51f3eaf6fb2664916401b7be0c8c94c59aa427a30690530a000adfd944a33c2",
- "vendorpk": "mj4PuJVDjvYBmDjKKBGSXf_LOSv3BBG4Jr4Ij3iOtWo",
- "updateAll": true,
- "data": {
-  "mailingpostalcode": "00001",
-  "firstname": "Test"
- }
-}
-```
-
-When `updateAll` is set to `true`, all the vendors that the user identified by the login token is registered with are updated. If the `updateAll` key is omitted or set to anything other than `true`, then the update is only applied to the vendor whose public key is supplied in `vendorpk`. The `vendorpk` value whose page the request is originating from must be supplied in either case.
-
-The currently available fields are:
-
-```
-firstname
-lastname
-mailingstreet
-mailingcity
-mailingpostalcode
-mailingstate
-mailingcountry
-phone
-homephone
-mobilephone
-email
-birthdate
-gender
-```
-
-The birthdate value should be in the format `yyyy-mm-dd`. All other fields are plain text format.
-
-On success the number of vendors updated is returned.
-
-```json
-{
- "success": true,
- "updated": 3
-}
-```
-
-A JLINC receipt from each B server for the update will become available asynchronously.
-
-
-{% include starsep.html %}
-
-### Editing user account items to share
-Each of the fields in a user's account with a vendor can be marked as to whether to share changes in that field with the vendor or not.
-
-These show up when accessing the account data as the fields ending in `_share` which correspond to the field in the basename. For example, `mailingstreet_share` indicates whether to share `mailingstreet` changes with the vendor.
-
-The API to edit these fields is:  
-_POST https://sandbox.a.jlinclabs.net/api/remotedata/updatecontactshare_
-```json
-{
- "token": "c51f3eaf6fb2664916401b7be0c8c94c59aa427a30690530a000adfd944a33c2",
- "vendorpk": "mj4PuJVDjvYBmDjKKBGSXf_LOSv3BBG4Jr4Ij3iOtWo",
- "updateAll": true,
- "sharedata": {
-  "mailingstreet": false,
-  "mailingcity": false,
-  "mailingpostalcode": false,
-  "mailingcountry": true
- }
-}
-```
-
-The `updateAll` key if set to `true` updates the changes with all the user's vendors.
-
-On success the number of vendors updated is returned.
-
-```json
-{
- "success": true,
- "updated": 3
-}
-```  
-
-No sharing of any fields with a particular vendor may be set like so:  
-```json
-{
- "token": "c51f3eaf6fb2664916401b7be0c8c94c59aa427a30690530a000adfd944a33c2",
- "vendorpk": "mj4PuJVDjvYBmDjKKBGSXf_LOSv3BBG4Jr4Ij3iOtWo",
- "sharedata": {
-  "all": false
- }
-}
-```
-
-{% include starsep.html %}
-
-### Retrieving user preferences
-
-Send the login token and the vendor public key to /api/remotedata/prefsdata/{login_token}/{vendor_pk}
-
-_GET https://sandbox.a.jlinclabs.net/api/remotedata/prefsdata/2dfb4668.../XxnnSLWq..._
-
-Returns:
-
-```json
-{
- "success": true,
- "prefsData": {
-  "emailmarketing": false,
-  "emailcomms": true
-  }
-}
-```
-
-Currently the `emailmarketing` and `emailcomms` fields are the only preference settings available.
-
-{% include starsep.html %}
-
-### Retrieving user's default preferences
-
-Send the login token to /api/remotedata/defaultprefs/{login_token}
-
-_GET https://sandbox.a.jlinclabs.net/api/remotedata/defaultprefs/2dfb4668..._
-
-Returns:
-
-```json
-{
- "success": true,
- "defaultPrefs": {
-  "emailmarketing": false,
-  "emailcomms": true
-  }
-}
-```
-
-
-{% include starsep.html %}
-
-### Editing user preferences
-
-The API to edit preference fields is:  
-_POST https://sandbox.a.jlinclabs.net/api/remotedata/updateprefsdata_
-```json
-{
- "token": "c51f3eaf6fb2664916401b7be0c8c94c59aa427a30690530a000adfd944a33c2",
- "vendorpk": "mj4PuJVDjvYBmDjKKBGSXf_LOSv3BBG4Jr4Ij3iOtWo",
- "updateAll": true,
- "data": {
-  "emailmarketing": true,
-  "emailcomms": true
- }
-}
-```
-
-The `updateAll` key if set to `true` updates the changes with all the user's vendors.
-
-On success the number of vendors updated is returned.
-
-```json
-{
- "success": true,
- "updated": 3
-}
-```  
-
-A JLINC receipt from each B server for the update will become available asynchronously.
-
-{% include starsep.html %}
-
-### Retrieving receipts
-
-Send the login token and the vendor public key to /api/remotedata/rcptsdata/{login_token}/{vendor_pk}
-
-_GET https://sandbox.a.jlinclabs.net/api/remotedata/rcptsdata/2dfb4668.../XxnnSLWq..._
-
-Returns an array of the user's receipts:
-
-```json
-{
- "success": true,
-  "receipts": [
-  {
-   "receipt": {
-    "@context": "https://jlinclabs.org/v05/context/isa-rcpt.jsonld",
-    "Version": "0.5",
-    "DataTS": 1516483209480,
-    "ISAHash": "KoCe5IQPtjtnXTyTNWTy8AeQleaw2Hxr8O6W02HjZ3k",
-    "DataHash": "g8HVIhhavQsgVuDjoA-hnrd3vKr0bJ2AokMus_tWvfc",
-    "RhldrPkID": "hRgwFkb9-7ed9xtX8009MltbpjaX7uIlJUYrMDRQUco",
-    "RhldrSig": "I2lslUas26yV23r4WVj5hzcfELlHOya-atVHYE0BQ2dLPFoUOv_17dseoFLi4tQRQflhXYo_ojNfdkyp-NJYD8TYy5zsr1CdN_8dqultqtnhCvdeaC2IAXKaNH-d2uoT",
-    "DcustPkAlg": "sha256:ed25519",
-    "DcustPkID": "GbxQVQrjoYbiQ-ALGJNmpblsLSKt3ROMmpa7Zn0Rv4g",
-    "DcustSig": "lNb6lrorwrMhSfh_0FRtNuRQrvSxbWYlm1ZZ287ZMfJ4RMWcSOBaxmHtnujO_rSn0itXJ2STwLaCHK1TQGcpDcTYy5zsr1CdN_8dqultqtnhCvdeaC2IAXKaNH-d2uoT"
-   },
-   "subject_data": {
-    "homephone": "555-111-3334",
-    "email": "user5@example.com"
-   },
-   "created": "2018-01-20T21:20:09.521Z"
+    "sisaEvents": []
   },
-  {
-   "receipt": {
-    "@context": "https://jlinclabs.org/v05/context/isa-rcpt.jsonld",
-    "Version": "0.5",
-    "ISAHash": "KoCe5IQPtjtnXTyTNWTy8AeQleaw2Hxr8O6W02HjZ3k",
-    "DataHash": "ONisgH5_rATj-JtbEFm4l8m5KNYk6bJSy4WR1ktB608",
-    "DataTS": 1515997768035,
-    "DcustPkAlg": "sha256:ed25519",
-    "DcustPkID": "GbxQVQrjoYbiQ-ALGJNmpblsLSKt3ROMmpa7Zn0Rv4g",
-    "RhldrPkID": "hRgwFkb9-7ed9xtX8009MltbpjaX7uIlJUYrMDRQUco",
-    "DcustSig": "hRsQWOYhPlMSDn3UTBbeVN8HD8g30zSiBgekirq4Im8UG4vTqmC7AcwPik4XJxGeSWf3ap9br9a_onPkx3ZTDJoJQ0aDRO33LMfZkQtlVa0DdMaaoy99GXSMAvFJ5xdm"
-   },
-   "subject_data": {
-    "firstname": "Test",
-    "lastname": "User5",
-    "name": "Test User5",
-    "mailingstreet": "123 Main Street",
-    "mailingcity": "Oakland",
-    "mailingstate": "CA",
-    "mailingpostalcode": "12345",
-    "mailingcountry": "US",
-    "homephone": "555-111-4444",
-    "mobilephone": "555-111-2222",
-    "email": "user5@example.com"
-   },
-   "created": "2018-01-15T06:29:28.050Z"
-  }
- ]
+  "organizationApikeyTwo": {
+    "organizationAccountData": {
+      "shared_personal_data": {},
+      "personal_data": {},
+      "consents": {},
+      "communication_channels": {}
+    },
+    "sisaEvents": []
+  },
 }
 ```
 
-Appending a query string with variables `page` and/or `num` controls the pagination.  Order doesn't matter, and either or both may be omitted.
+### Get Organization SISA Events
 
-If omitted, `page` defaults to 1 and `num` (the number of receipts to show per page) defaults to 10.
+Endpoint:
+```
+GET /api/organizations/sisa_events/:organizationApikey?page=1
+```
 
-Receipts are always sorted by creation date/time, with the newest at the top.
+Params:
+```
+page (number) (optional)
+```
 
-Example:  
-_GET https://.../api/remotedata/rcptsdata/.../...?page=2&num=20_
+Response body:
+```json
+{
+  "success": true,
+  "organizationSisaEvents": []
+}
+```
 
--->
+
+### Get Organization Feed Posts
+
+Endpoint:
+```
+GET /api/organization/:organizationApikey/feed/posts?before=2018-11-07T22%3A19%3A26.235Z
+```
+
+Params:
+```
+before (url encoded ISO Date String) (optional)
+```
+
+Response body:
+```json
+{
+  "success": true,
+  "posts": []
+}
+```
+
+### Create Organization Feed Post
+
+Endpoint:
+```
+POST /api/organization/:organizationApikey/feed/posts/create
+```
+
+Post body:
+```json
+{
+  "post": {
+    "title": "This is the post title",
+    "body": "This is the post body"
+  }
+}
+```
+
+Response body:
+```json
+{
+  "success": true,
+  "post": {
+    "uid": "69ac21843f5836b975ca1c8c31e800f2",
+    "organizationApikey": "jlinclabs",
+    "title": "This is the post title",
+    "body": "This is the post body",
+    "createdAt": "2018-11-08T00:54:27.389Z",
+    "organizationPost": false
+  }
+}
+```
+
+
+### Delete Organization Feed Post
+
+Endpoint:
+```
+POST /api/organization/:organizationApikey/feed/posts/delete
+```
+
+Post body:
+```json
+{
+  "feedPostUid": "69ac21843f5836b975ca1c8c31e800f2"
+}
+```
+
+Response body:
+```json
+{
+  "success": true
+}
+```
+
+### Get Buying Interests
+
+
+Endpoint:
+```
+GET /api/buying_interest
+```
+
+Response body:
+```json
+{
+  "success": true,
+  "buyingInterests": []
+}
+```
+
+### Create A Buying Interest
+
+
+Endpoint:
+```
+POST /api/buying_interest/create
+```
+
+Post body:
+```json
+{
+  "buyingInterest": {
+    "industry": "Energy",
+    "currency": "$",
+    "description": "i fine pair of shoes",
+    "location": "San Francisco",
+    "price_low": 10000,
+    "price_high": 20000,
+    "beginning_date": "2018-11-08",
+    "end_date": "2020-12-31",
+    "brands": [
+      "Liberty Utilities",
+      "Ecotricity",
+      "UK Power Networks"
+    ],
+    "tags": [
+      "Fixed rate",
+      "Green energy",
+      "Variable rate"
+    ]
+  }
+}
+```
+
+Response body:
+```json
+{
+  "success": true,
+  "buyingInterest": {}
+}
+```
+
+
+
+### Delete A Buying Interest
+
+Endpoint:
+```
+POST /api/buying_interest/delete
+```
+
+Post body:
+```json
+{
+  "buyingInterestUid": "fd324158c148efe7e88498cd089055e4"
+}
+```
+
+Response body:
+```json
+{
+  "success": true
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

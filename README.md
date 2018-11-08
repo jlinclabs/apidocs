@@ -8,4 +8,10 @@
 - `gem install bundler`
 - `bundle install`
 
+### Starting the Server
+
+```sh
+bundle exec jekyll serve
+```
+
 ## Publishing

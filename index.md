@@ -21,16 +21,16 @@ The philosophy behind these APIs is that an unsuccessful call should still retur
 
 ```json
 {
- "success": false,
- "error": "Bad Password"
+  "success": false,
+  "error": "Bad Password"
 }
 ```
 If `success` is true, then the other data is context specific.
 
 ```json
 {
- "success": true,
- "token": "b214f47a663108ea7b7bd952e3b655d1"
+  "success": true,
+  "token": "b214f47a663108ea7b7bd952e3b655d1"
 }
 ```
 Although this does not conform to REST, the REST conventions are still respected in two ways. First, calls that return information without changing server state use `GET` and all others use `POST`.

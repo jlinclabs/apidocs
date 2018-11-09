@@ -440,7 +440,7 @@ Response body:
 ```
 
 _For more information in the `sisa` object please see the
-<a target="_blank" rel="nofollow" href="‭https://protocol.jlinc.org">JLINC Protocol</a>
+<a target="_blank" rel="nofollow" href="https://protocol.jlinc.org">JLINC Protocol</a>
 documentation at ‭https://protocol.jlinc.org_
 
 ### Get Your Account Data for an Organization
